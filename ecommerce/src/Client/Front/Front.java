@@ -21,6 +21,7 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class Front extends Application {
     private Stage primaryStage;
@@ -263,7 +264,7 @@ public class Front extends Application {
 
             @Override
             public void handle(ActionEvent e) {
-                ServiceMagasin.payer();
+                afficherAlerteConfirmationPaiement();
             }
         });
 
@@ -276,5 +277,43 @@ public class Front extends Application {
         primaryStage.setScene(scene);
 
         primaryStage.show();
+    }
+
+    public void afficherAlerteConfirmationPaiement()
+    {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmation de paiement");
+        alert.setHeaderText("Souhaitez vous procéder au paiement?");
+        alert.setContentText("Votre total est de " + Corbeille.getTotal() + "€");
+
+        ButtonType boutonOui = new ButtonType("Oui");
+        ButtonType boutonNon = new ButtonType("Non");
+
+        alert.getButtonTypes().setAll(boutonOui, boutonNon);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == boutonOui){
+            boolean resultatPaiement = ServiceMagasin.payer();
+
+            Alert alert1 = new Alert(Alert.AlertType.INFORMATION);
+            alert1.setTitle("Confirmation de paiement");
+            if(resultatPaiement == true)
+            {
+                alert1.setHeaderText("Paiement validé");
+                alert1.setContentText("Merci et à bientot");
+            }
+            else
+            {
+                alert1.setHeaderText("Paiement Impossible");
+                alert1.setContentText("Veulliez vérifier votre solde ou vos identifiants");
+            }
+            alert1.showAndWait();
+            Corbeille.viderCorbeille();
+            afficherSceneConnexion();
+        } else if (result.get() == boutonNon) {
+
+        } else {
+
+        }
     }
 }
